@@ -78,19 +78,6 @@
       #controls { flex-direction: column; align-items: stretch; }
       button { width: 100%; }
     }
-
-    /* --- HIDE any emoji/flag in attribution text --- */
-    .leaflet-control-attribution {
-      unicode-bidi: isolate;
-    }
-    .leaflet-control-attribution::after {
-      /* ensure nothing appended shows up */
-      content: "";
-    }
-    /* crude fallback: completely hide first emoji-like char */
-    .leaflet-control-attribution {
-      font-variant-emoji: none;
-    }
   </style>
 </head>
 
@@ -111,22 +98,23 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const supabaseUrl = "https://kafyiqhusiuvtosvlbnf.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZnlpcWh1c2l1dnRvc3ZsYm5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5OTc2ODgsImV4cCI6MjA3MjU3MzY4OH0.MQvO5bchDN45RtWg8kM-c4Ke6coNixWUPEHlStDtx1o";
+    const supabaseUrl = "INSERT SUPABASE URL";
+    const supabaseKey = "INSERT SUPABASE ANON PUBLIC KEY";
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
     const ukBounds = [[49.8, -8.6], [60.9, 2.1]];
 
+    // disable the default attribution control
     const map = L.map('map', {
+      attributionControl: false,
       maxBounds: ukBounds,
       maxBoundsViscosity: 0.7,
       minZoom: 5,
       maxZoom: 18
     }).setView([54.5, -3], 6);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    // no attribution passed here, so no flag/emoji, no leaflet link
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
 
     const markersBounds = L.latLngBounds();
 
