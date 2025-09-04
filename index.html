@@ -78,6 +78,19 @@
       #controls { flex-direction: column; align-items: stretch; }
       button { width: 100%; }
     }
+
+    /* --- HIDE any emoji/flag in attribution text --- */
+    .leaflet-control-attribution {
+      unicode-bidi: isolate;
+    }
+    .leaflet-control-attribution::after {
+      /* ensure nothing appended shows up */
+      content: "";
+    }
+    /* crude fallback: completely hide first emoji-like char */
+    .leaflet-control-attribution {
+      font-variant-emoji: none;
+    }
   </style>
 </head>
 
@@ -115,7 +128,6 @@
       attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // bounds object to keep track of all markers
     const markersBounds = L.latLngBounds();
 
     function addMarker(p) {
@@ -139,7 +151,6 @@
       }
       data.forEach(addMarker);
 
-      // Fit map to all markers
       if (markersBounds.isValid()) {
         map.fitBounds(markersBounds, { padding: [40, 40], maxZoom: 16 });
       }
@@ -192,8 +203,6 @@
         }
 
         addMarker({ label, address, postcode, lat, lng });
-
-        // Refit map to include the new marker
         if (markersBounds.isValid()) {
           map.fitBounds(markersBounds, { padding: [40, 40], maxZoom: 16 });
         }
