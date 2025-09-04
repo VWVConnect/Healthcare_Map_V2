@@ -108,12 +108,15 @@
       maxBounds: ukBounds,
       maxBoundsViscosity: 0.7,
       minZoom: 5,
-      maxZoom: 18,          // allow much closer zoom
+      maxZoom: 18
     }).setView([54.5, -3], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    // bounds object to keep track of all markers
+    const markersBounds = L.latLngBounds();
 
     function addMarker(p) {
       const popupHtml = `
@@ -121,9 +124,11 @@
         ${p.address}<br/>
         ${p.postcode}
       `;
-      L.marker([p.lat, p.lng])
+      const marker = L.marker([p.lat, p.lng])
         .addTo(map)
         .bindPopup(popupHtml);
+
+      markersBounds.extend(marker.getLatLng());
     }
 
     async function loadProperties() {
@@ -133,6 +138,11 @@
         return;
       }
       data.forEach(addMarker);
+
+      // Fit map to all markers
+      if (markersBounds.isValid()) {
+        map.fitBounds(markersBounds, { padding: [40, 40], maxZoom: 16 });
+      }
     }
 
     async function addProperty() {
@@ -182,6 +192,11 @@
         }
 
         addMarker({ label, address, postcode, lat, lng });
+
+        // Refit map to include the new marker
+        if (markersBounds.isValid()) {
+          map.fitBounds(markersBounds, { padding: [40, 40], maxZoom: 16 });
+        }
 
         labelInput.value = "";
         addressInput.value = "";
