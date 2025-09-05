@@ -78,6 +78,19 @@
       #controls { flex-direction: column; align-items: stretch; }
       button { width: 100%; }
     }
+
+    /* animation for custom markers */
+    .custom-marker {
+      transition: transform 0.2s ease;
+      transform-origin: center bottom;
+      cursor: pointer;
+    }
+    .custom-marker:hover {
+      transform: scale(1.2);
+    }
+    .custom-marker.clicked {
+      transform: scale(1.3);
+    }
   </style>
 </head>
 
@@ -104,7 +117,6 @@
 
     const ukBounds = [[49.8, -8.6], [60.9, 2.1]];
 
-    // disable default attribution to remove flag/link
     const map = L.map('map', {
       attributionControl: false,
       maxBounds: ukBounds,
@@ -113,19 +125,19 @@
       maxZoom: 18
     }).setView([54.5, -3], 6);
 
-    // tile layer (no attribution passed, so no emoji/link)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
 
-    // custom SVG drop-shaped icon
+    // drop marker with #00a6c5 fill and #192543 stroke
     const customIcon = L.divIcon({
       html: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
-          <path fill="#00a6c5" stroke="#fff" stroke-width="2"
+        <svg class="custom-marker" xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 24 24" width="32" height="32">
+          <path fill="#00a6c5" stroke="#192543" stroke-width="2"
                 d="M12 2C7.6 2 4 5.6 4 10c0 5.3 8 12 8 12s8-6.7 8-12c0-4.4-3.6-8-8-8z"/>
         </svg>`,
       className: "",
       iconSize: [32, 32],
-      iconAnchor: [16, 32] // bottom tip sits at lat/lng
+      iconAnchor: [16, 32]
     });
 
     const markersBounds = L.latLngBounds();
@@ -139,6 +151,13 @@
       const marker = L.marker([p.lat, p.lng], { icon: customIcon })
         .addTo(map)
         .bindPopup(popupHtml);
+
+      // simple "clicked" animation toggle
+      marker.on('click', e => {
+        const svg = e.target._icon.querySelector('.custom-marker');
+        svg.classList.toggle('clicked');
+        setTimeout(() => svg.classList.remove('clicked'), 300); // auto reset
+      });
 
       markersBounds.extend(marker.getLatLng());
     }
