@@ -104,7 +104,7 @@
 
     const ukBounds = [[49.8, -8.6], [60.9, 2.1]];
 
-    // disable the default attribution control
+    // disable default attribution to remove flag/link
     const map = L.map('map', {
       attributionControl: false,
       maxBounds: ukBounds,
@@ -113,8 +113,20 @@
       maxZoom: 18
     }).setView([54.5, -3], 6);
 
-    // no attribution passed here, so no flag/emoji, no leaflet link
+    // tile layer (no attribution passed, so no emoji/link)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
+
+    // custom SVG drop-shaped icon
+    const customIcon = L.divIcon({
+      html: `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+          <path fill="#00a6c5" stroke="#fff" stroke-width="2"
+                d="M12 2C7.6 2 4 5.6 4 10c0 5.3 8 12 8 12s8-6.7 8-12c0-4.4-3.6-8-8-8z"/>
+        </svg>`,
+      className: "",
+      iconSize: [32, 32],
+      iconAnchor: [16, 32] // bottom tip sits at lat/lng
+    });
 
     const markersBounds = L.latLngBounds();
 
@@ -124,7 +136,7 @@
         ${p.address}<br/>
         ${p.postcode}
       `;
-      const marker = L.marker([p.lat, p.lng])
+      const marker = L.marker([p.lat, p.lng], { icon: customIcon })
         .addTo(map)
         .bindPopup(popupHtml);
 
